@@ -1,11 +1,11 @@
 {
   "name": "coffeescript-accessors",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Fancy getter and setter generation in CoffeeScript",
   "main": "lib/index.js",
   "scripts": {
     "test": "mocha",
-    "prepublish": "coffee -c -o lib/ src/index.coffee"
+    "prepublish": "coffee -c -o lib src"
   },
   "repository": {
     "type": "git",

@@ -7,9 +7,9 @@ _.isArray = require 'lodash.isarray'
 module.exports =
   bootstrap: ->
     accessors = @
-    Function::getter = (fields...) -> accessors.getter(@prototype, fields...).bind(accessors)
-    Function::setter = (fields...) -> accessors.setter(@prototype, fields...).bind(accessors)
-    Function::accessor = (fields...) -> accessors.accessor(@prototype, fields...).bind(accessors)
+    Function::getter = (fields...) -> accessors.getter.call(accessors, @prototype, fields...)
+    Function::setter = (fields...) -> accessors.setter.call(accessors, @prototype, fields...)
+    Function::accessor = (fields...) -> accessors.accessor.call(accessors, @prototype, fields...)
 
   getter: (obj, fields...) ->
     for field in fields
