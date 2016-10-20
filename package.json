@@ -4,7 +4,7 @@
   "description": "Fancy getter and setter generation in CoffeeScript",
   "main": "lib/index.js",
   "scripts": {
-    "test": "mocha",
+    "test": "mocha --compilers coffee:coffee-script/register",
     "prepublish": "coffee -c -o lib src"
   },
   "repository": {
