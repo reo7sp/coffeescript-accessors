@@ -30,11 +30,10 @@ class A
   num: 1
   someStr: 'test'
 
-  constructor: ->
-    attr.getter @, 'num'
-    attr.setter @, 'num'
-    attr.accessor @, 'someStr'
-    attr.reader @, 'a', 'b' # remember ruby?
+  attr.getter @, 'num'
+  attr.setter @, 'num'
+  attr.accessor @, 'someStr'
+  attr.reader @, 'a', 'b' # remember ruby?
 
 a = new A()
 a.setSomeStr('it works')

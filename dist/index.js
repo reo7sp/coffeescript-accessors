@@ -18,22 +18,24 @@
       var accessors;
       accessors = this;
       Function.prototype.getter = function() {
-        var fields, ref;
-        fields = 1 <= arguments.length ? slice.call(arguments, 0) : [];
-        return (ref = accessors.getter).call.apply(ref, [accessors, this.prototype].concat(slice.call(fields)));
+        var ref;
+        return (ref = accessors.getter).call.apply(ref, [accessors, this].concat(slice.call(arguments)));
       };
       Function.prototype.setter = function() {
-        var fields, ref;
-        fields = 1 <= arguments.length ? slice.call(arguments, 0) : [];
-        return (ref = accessors.setter).call.apply(ref, [accessors, this.prototype].concat(slice.call(fields)));
+        var ref;
+        return (ref = accessors.setter).call.apply(ref, [accessors, this].concat(slice.call(arguments)));
       };
       return Function.prototype.accessor = function() {
-        var fields, ref;
-        fields = 1 <= arguments.length ? slice.call(arguments, 0) : [];
-        return (ref = accessors.accessor).call.apply(ref, [accessors, this.prototype].concat(slice.call(fields)));
+        var ref;
+        return (ref = accessors.accessor).call.apply(ref, [accessors, this].concat(slice.call(arguments)));
       };
     },
     getter: function() {
+      var fields, obj;
+      obj = arguments[0], fields = 2 <= arguments.length ? slice.call(arguments, 1) : [];
+      return this.instanceGetter.apply(this, [obj.prototype].concat(slice.call(fields)));
+    },
+    instanceGetter: function() {
       var field, fields, i, len, name, obj, prefix, type;
       obj = arguments[0], fields = 2 <= arguments.length ? slice.call(arguments, 1) : [];
       for (i = 0, len = fields.length; i < len; i++) {
@@ -56,12 +58,22 @@
               }
             })();
           }
-          this._createGetter(obj, field, prefix);
+          this._createGetter(obj, name, prefix);
         }
       }
     },
-    reader: this.getter,
+    reader: function() {
+      return this.getter.apply(this, arguments);
+    },
+    instanceReader: function() {
+      return this.instanceGetter.apply(this, arguments);
+    },
     setter: function() {
+      var fields, obj;
+      obj = arguments[0], fields = 2 <= arguments.length ? slice.call(arguments, 1) : [];
+      return this.instanceSetter.apply(this, [obj.prototype].concat(slice.call(fields)));
+    },
+    instanceSetter: function() {
       var field, fields, i, len, name, obj, prefix;
       obj = arguments[0], fields = 2 <= arguments.length ? slice.call(arguments, 1) : [];
       for (i = 0, len = fields.length; i < len; i++) {
@@ -74,23 +86,37 @@
           } else {
             name = field.name;
           }
-          this._createSetter(obj, name);
+          if (prefix == null) {
+            prefix = 'set';
+          }
+          this._createSetter(obj, name, prefix);
         }
       }
     },
-    writer: this.setter,
+    writer: function() {
+      return this.setter.apply(this, arguments);
+    },
+    instanceWriter: function() {
+      return this.instanceSetter.apply(this, arguments);
+    },
     accessor: function() {
       var fields, obj;
       obj = arguments[0], fields = 2 <= arguments.length ? slice.call(arguments, 1) : [];
       this.reader.apply(this, [obj].concat(slice.call(fields)));
       return this.writer.apply(this, [obj].concat(slice.call(fields)));
     },
+    instanceAccessor: function() {
+      var fields, obj;
+      obj = arguments[0], fields = 2 <= arguments.length ? slice.call(arguments, 1) : [];
+      this.instanceReader.apply(this, [obj].concat(slice.call(fields)));
+      return this.instanceWriter.apply(this, [obj].concat(slice.call(fields)));
+    },
     _createGetter: function(obj, field, prefix) {
       if (prefix == null) {
         prefix = 'get';
       }
       return obj[this._getAccessorMethodName(field, prefix)] = function() {
-        return obj[field];
+        return this[field];
       };
     },
     _createSetter: function(obj, field, prefix) {
@@ -98,7 +124,7 @@
         prefix = 'set';
       }
       return obj[this._getAccessorMethodName(field, prefix)] = function(newValue) {
-        return obj[field] = newValue;
+        return this[field] = newValue;
       };
     },
     _getAccessorMethodName: function(field, prefix) {

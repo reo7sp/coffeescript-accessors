@@ -1,11 +1,12 @@
 {
   "name": "coffeescript-accessors",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "Fancy getter and setter generation in CoffeeScript",
-  "main": "lib/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "mocha --compilers coffee:coffee-script/register",
-    "prepublish": "coffee -c -o lib src"
+    "js": "coffee -c -o dist src",
+    "prepublish": "npm run js"
   },
   "repository": {
     "type": "git",

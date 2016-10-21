@@ -7,11 +7,14 @@ _.isArray = require 'lodash.isarray'
 module.exports =
   bootstrap: ->
     accessors = @
-    Function::getter = (fields...) -> accessors.getter.call(accessors, @prototype, fields...)
-    Function::setter = (fields...) -> accessors.setter.call(accessors, @prototype, fields...)
-    Function::accessor = (fields...) -> accessors.accessor.call(accessors, @prototype, fields...)
+    Function::getter = -> accessors.getter.call(accessors, @, arguments...)
+    Function::setter = -> accessors.setter.call(accessors, @, arguments...)
+    Function::accessor = -> accessors.accessor.call(accessors, @, arguments...)
 
   getter: (obj, fields...) ->
+    @instanceGetter(obj.prototype, fields...)
+
+  instanceGetter: (obj, fields...) ->
     for field in fields
       if _.isString(field)
         @_createGetter(obj, field)
@@ -21,19 +24,24 @@ module.exports =
         else
           {prefix, type, name} = field
 
-        if not prefix?
-          prefix =
-            switch type
-              when 'bool' then 'is'
-              else 'get'
+        prefix ?=
+          switch type
+            when 'bool' then 'is'
+            else 'get'
 
-        @_createGetter(obj, field, prefix)
+        @_createGetter(obj, name, prefix)
     return
 
-  reader: (args...) ->
-    @getter(args...)
+  reader: ->
+    @getter(arguments...)
+
+  instanceReader: ->
+    @instanceGetter(arguments...)
 
   setter: (obj, fields...) ->
+    @instanceSetter(obj.prototype, fields...)
+
+  instanceSetter: (obj, fields...) ->
     for field in fields
       if _.isString(field)
         @_createSetter(obj, field)
@@ -43,15 +51,24 @@ module.exports =
         else
           {name} = field
 
-        @_createSetter(obj, name)
+        prefix ?= 'set'
+
+        @_createSetter(obj, name, prefix)
     return
 
-  writer: (args...) ->
-    @setter(args...)
+  writer: ->
+    @setter(arguments...)
+
+  instanceWriter: ->
+    @instanceSetter(arguments...)
 
   accessor: (obj, fields...) ->
     @reader(obj, fields...)
     @writer(obj, fields...)
+
+  instanceAccessor: (obj, fields...) ->
+    @instanceReader(obj, fields...)
+    @instanceWriter(obj, fields...)
 
   _createGetter: (obj, field, prefix = 'get') ->
     obj[@_getAccessorMethodName(field, prefix)] = -> @[field]
