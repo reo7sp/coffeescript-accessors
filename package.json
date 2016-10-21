@@ -1,6 +1,6 @@
 {
   "name": "coffeescript-accessors",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Fancy getter and setter generation in CoffeeScript",
   "main": "lib/index.js",
   "scripts": {

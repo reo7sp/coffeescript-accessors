@@ -30,7 +30,8 @@ module.exports =
         @_createGetter(obj, field, prefix)
     return
 
-  reader: @getter
+  reader: (args...) ->
+    @getter(args...)
 
   setter: (obj, fields...) ->
     for field in fields
@@ -45,17 +46,18 @@ module.exports =
         @_createSetter(obj, name)
     return
 
-  writer: @setter
+  writer: (args...) ->
+    @setter(args...)
 
   accessor: (obj, fields...) ->
     @reader(obj, fields...)
     @writer(obj, fields...)
 
   _createGetter: (obj, field, prefix = 'get') ->
-    obj[@_getAccessorMethodName(field, prefix)] = -> obj[field]
+    obj[@_getAccessorMethodName(field, prefix)] = -> @[field]
 
   _createSetter: (obj, field, prefix = 'set') ->
-    obj[@_getAccessorMethodName(field, prefix)] = (newValue) -> obj[field] = newValue
+    obj[@_getAccessorMethodName(field, prefix)] = (newValue) -> @[field] = newValue
 
   _getAccessorMethodName: (field, prefix) ->
     "#{prefix}#{_.upperFirst(_.camelCase(field))}"
